@@ -18,9 +18,8 @@ def with_calling_file_context(func):
     return wrapper
 
 
-@with_calling_file_context
 def puzzle_info(
-    filepath: str, pad_day: bool = False
+    filepath: Path, pad_day: bool = False
 ) -> Union[Tuple[int, int], Tuple[int, str]]:
     """
     Extract year and day information from the calling file's path.
@@ -45,19 +44,17 @@ def puzzle_info(
         >>> print(year, day)
         2024 01
     """
-    p = Path(filepath)
-
     # Extract year from parent directory (e.g., "y2024" or "2024")
-    parent_dir = p.parts[-2]
+    parent_dir = filepath.parts[-2]
     if parent_dir.startswith("y"):
         year = int(parent_dir[1:])
     else:
         year = int(parent_dir)
 
     # Extract day from filename (e.g., "day01_1.py" or "day01.py")
-    filename = p.stem  # Gets filename without extension
-    day_part = filename.split("_")[0]  # Gets "day01" from "day01_1"
-    day = int(day_part.replace("day", ""))
+    filename = filepath.stem  # Gets filename without extension
+    day_part = filename.split("_")[0]  # Gets "d01" from "d01_1"
+    day = int(day_part.replace("d", ""))
 
     if pad_day:
         return year, f"{day:02d}"
