@@ -3,23 +3,24 @@
 import sys
 from functools import wraps
 from pathlib import Path
-from typing import Literal, Tuple, Union
+from typing import Tuple, Union
 
 
 def with_calling_file_context(func):
     """Decorator that passes the calling file's path to the wrapped function."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         frame = sys._getframe(1)
         filepath = frame.f_code.co_filename
         return func(filepath, *args, **kwargs)
+
     return wrapper
 
 
 @with_calling_file_context
 def puzzle_info(
-    filepath: str,
-    pad_day: bool = False
+    filepath: str, pad_day: bool = False
 ) -> Union[Tuple[int, int], Tuple[int, str]]:
     """
     Extract year and day information from the calling file's path.
@@ -29,6 +30,7 @@ def puzzle_info(
     - /path/to/2024/day01.py -> (2024, 1) or (2024, "01")
 
     Args:
+        filepath: Path to the calling file (automatically injected by decorator).
         pad_day: If True, return day as zero-padded string. If False, return as int.
 
     Returns:
@@ -47,15 +49,15 @@ def puzzle_info(
 
     # Extract year from parent directory (e.g., "y2024" or "2024")
     parent_dir = p.parts[-2]
-    if parent_dir.startswith('y'):
+    if parent_dir.startswith("y"):
         year = int(parent_dir[1:])
     else:
         year = int(parent_dir)
 
     # Extract day from filename (e.g., "day01_1.py" or "day01.py")
     filename = p.stem  # Gets filename without extension
-    day_part = filename.split('_')[0]  # Gets "day01" from "day01_1"
-    day = int(day_part.replace('day', ''))
+    day_part = filename.split("_")[0]  # Gets "day01" from "day01_1"
+    day = int(day_part.replace("day", ""))
 
     if pad_day:
         return year, f"{day:02d}"
@@ -64,15 +66,13 @@ def puzzle_info(
 
 @with_calling_file_context
 def read_input(
-    filepath: str,
-    test: bool = False,
-    strip: bool = True,
-    data_dir: str = "../../data"
+    filepath: str, test: bool = False, strip: bool = True, data_dir: str = "../../data"
 ) -> str:
     """
     Read puzzle input file based on the calling file's location.
 
     Args:
+        filepath: Path to the calling file (automatically injected by decorator).
         test: If True, read from testXX.txt. If False, read from inputXX.txt.
         strip: If True, strip whitespace from the content.
         data_dir: Relative path from calling file to data directory.
