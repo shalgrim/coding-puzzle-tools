@@ -100,10 +100,16 @@ def read_input(
         >>> test_lines = read_input(test=True)  # Reads ../../data/2024/test01.txt as lines
     """
     calling_file = Path(filepath)
-    year, day = puzzle_info(calling_file, pad_day=True)
+    year, day, part = puzzle_info(calling_file, pad_day=True)
 
     filetype = "test" if test else "input"
-    input_path = calling_file.parent / data_dir / str(year) / f"{filetype}{day}.txt"
+
+    if part is None:
+        input_path = calling_file.parent / data_dir / str(year) / f"{filetype}{day}.txt"
+    else:
+        input_path = (
+            calling_file.parent / data_dir / str(year) / f"{filetype}{day}_{part}.txt"
+        )
 
     with open(input_path) as f:
         if mode == InputMode.LINES:
