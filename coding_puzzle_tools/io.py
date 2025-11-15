@@ -28,13 +28,13 @@ def with_calling_file_context(func):
 
 def puzzle_info(
     filepath: Path, pad_day: bool = False
-) -> Union[Tuple[int, int], Tuple[int, str]]:
+) -> Union[Tuple[int, int, int], Tuple[int, str, int]]:
     """
     Extract year and day information from the calling file's path.
 
     Expects file structure like:
-    - /path/to/y2024/day01_1.py -> (2024, 1) or (2024, "01")
-    - /path/to/2024/day01.py -> (2024, 1) or (2024, "01")
+    - /path/to/y2024/d01_1.py -> (2024, 1) or (2024, "01")
+    - /path/to/2024/d01.py -> (2024, 1) or (2024, "01")
 
     Args:
         filepath: Path to the calling file (automatically injected by decorator).
@@ -44,7 +44,7 @@ def puzzle_info(
         Tuple of (year, day) where day is int or str depending on pad_day.
 
     Example:
-        >>> # In file y2024/day01_1.py
+        >>> # In file y2024/d01_1.py
         >>> year, day = puzzle_info()
         >>> print(year, day)
         2024 1
@@ -59,14 +59,17 @@ def puzzle_info(
     else:
         year = int(parent_dir)
 
-    # Extract day from filename (e.g., "day01_1.py" or "day01.py")
+    # Extract day from filename (e.g., "d01_1.py" or "d01.py")
     filename = filepath.stem  # Gets filename without extension
     day_part = filename.split("_")[0]  # Gets "d01" from "d01_1"
     day = int(day_part.replace("d", ""))
+    day = f"{day:02d}" if pad_day else day
 
-    if pad_day:
-        return year, f"{day:02d}"
-    return year, day
+    # part 1, part 2, etc.
+    # e.g., d01_2.py for part 2 of day 1
+    part = int(day_part.split("_")[1]) if "_" in day_part else None
+
+    return year, day, part
 
 
 @with_calling_file_context
