@@ -67,7 +67,7 @@ def puzzle_info(
 
     # part 1, part 2, etc.
     # e.g., d01_2.py for part 2 of day 1
-    part = int(day_part.split("_")[1]) if "_" in day_part else None
+    part = int(filename.split("_")[1]) if "_" in filename else None
 
     return year, day, part
 
