@@ -1,5 +1,6 @@
 """Input/output utilities for puzzle solutions."""
 
+import re
 import sys
 from enum import Enum
 from functools import wraps
@@ -62,7 +63,7 @@ def puzzle_info(
     # Extract day from filename (e.g., "d01_1.py" or "d01.py")
     filename = filepath.stem  # Gets filename without extension
     day_part = filename.split("_")[0]  # Gets "d01" from "d01_1"
-    day = int(day_part.replace("d", ""))
+    day = int(re.sub(r"d(ay)?", "", day_part))
     day = f"{day:02d}" if pad_day else day
 
     # part 1, part 2, etc.
@@ -75,6 +76,7 @@ def puzzle_info(
 @with_calling_file_context
 def read_input(
     filepath: str,
+    *,
     test: bool = False,
     strip: bool = True,
     data_dir: str = "../../data",
@@ -110,6 +112,12 @@ def read_input(
         input_path = (
             calling_file.parent / data_dir / str(year) / f"{filetype}{day}_{part}.txt"
         )
+        if (
+            not input_path.is_file()
+        ):  # allows user to just save first part as eg input01.txt
+            input_path = (
+                calling_file.parent / data_dir / str(year) / f"{filetype}{day}.txt"
+            )
 
     with open(input_path) as f:
         if mode == InputMode.LINES:
